@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration Form</title>
+ 
+  <style>
+         /* Style input with invalid value in red */
+         input#name:invalid:focus {
+             border: 1px solid red; 
+         }
+         /* Global reset for margin, padding, and font style */
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+       
+        body{
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #437d94;
+        }
+        /* Container for the form */
+        .form-container {
+            width: 300px;
+            margin: 0 auto;
+        }
+       
+        table {  
+            font-family:sans-serif;
+            th, td {
+                padding:.25em .5em;
+                text-align:left;
+            }
+            td {
+                background-color:#eee;    
+            }
+            th {
+                background-color:rgb(0, 3, 5);
+                color:#fff;
+            }
+        }
+
+        
+        .zigzag {
+            border-collapse:separate;
+            border-spacing:.25em 1em;
+            tbody tr:nth-child(odd) {
+                transform:rotate(2deg);
+            }
+            thead tr,
+            tbody tr:nth-child(even) {
+                transform:rotate(-2deg);
+            }
+        }
+        /* Common styles for input and button */
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: whitesmoke;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+
+  <!-- Registration Form -->
+  <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+    <h2 class="text-center text-2xl font-bold mb-6">Registration Form</h2>
+    <form id="registrationForm">
+      <div class="mb-4">
+        <label class="block font-medium mb-2" for="name">Name</label>
+        <input required type="text" id="name" placeholder="Full Name" class="block w-full rounded-lg border-gray-300 shadow-md px-4 py-3">
+      </div>
+      <div class="mb-4">
+        <label class="block font-medium mb-2" for="email">Email</label>
+        <input required type="email" id="email" placeholder="Email" class="block w-full rounded-lg border-gray-300 shadow-md px-4 py-3">
+      </div>
+      <div class="mb-4">
+        <label class="block font-medium mb-2" for="password">Password</label>
+        <input required type="password" id="password" placeholder="Password" class="block w-full rounded-lg border-gray-300 shadow-md px-4 py-3">
+      </div>
+      <div class="mb-4">
+        <label class="block font-medium mb-2" for="dob">Date of Birth</label>
+        <input required type="date" id="dob" class="block w-full rounded-lg border-gray-300 shadow-md px-4 py-3">
+        <p id="dobError" class="text-red-500 mt-2 hidden">Date of birth must be for ages between 18 and 55.</p>
+      </div>
+      <div class="mb-6">
+        <label class="inline-flex items-center">
+          <input required type="checkbox" id="terms" class="form-checkbox h-5 w-5 text-green-500">
+          <span class="ml-2 text-gray-700">Accept Terms & Conditions</span>
+        </label>
+      </div>
+      <div>
+        <button type="submit" class="w-full bg-green-500 text-white rounded-lg py-3 font-semibold hover:bg-green-600 transition">Submit</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Entries Section -->
+  <div class="bg-white p-8 mt-8 rounded-lg shadow-xl w-full max-w-4xl">
+    <h2 class="text-center text-2xl font-bold mb-6">Entries</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Password</th>
+          <th>Dob</th>
+          <th>Accepted terms?</th>
+        </tr>
+      </thead>
+      <tbody id="entriesTableBody">
+        <!-- Entries will be inserted here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
