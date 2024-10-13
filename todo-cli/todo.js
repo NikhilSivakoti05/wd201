@@ -1,105 +1,85 @@
-const todoList = () => {
-  let tasks = [];
-  
-  const addTask = (task) => {
-    tasks.push(task);
-  };
-  
-  const markCompleted = (index) => {
-    if (index >= 0 && index < tasks.length) {
-      tasks[index].completed = true;
-    }
-  };
+// Import the todoList module and extract functions for testing
+const todoApp = require("../todo");
+const { all, markAsComplete, add, getOverdueItems, getDueTodayItems, getDueLaterItems } = todoApp;
 
-  const getOverdue = () => {
-    // Returning overdue tasks using a loop and conditional check
-    let overdueTasks = [];
-    for (let i = 0; i < tasks.length; i++) {
-      if (tasks[i].dueDate < today) {
-        overdueTasks.push(tasks[i]);
-      }
-    }
-    return overdueTasks;
-  };
-
-  const getDueToday = () => {
-    // Using array reduce to filter tasks due today
-    return tasks.reduce((dueTodayTasks, task) => {
-      if (task.dueDate === today) {
-        dueTodayTasks.push(task);
-      }
-      return dueTodayTasks;
-    }, []);
-  };
-
-  const getDueLater = () => {
-    // Using array mapping and filtering approach
-    const laterTasks = tasks.map(task => {
-      if (task.dueDate > today) {
-        return task;
-      }
-    }).filter(task => task !== undefined);
-    return laterTasks;
-  };
-
-  const formatTaskList = (taskList) => {
-    // Formatting the list using an alternative approach with template literals
-    const formattedList = taskList.map((task) => {
-      const checkbox = task.completed ? '[x]' : '[ ]';
-      const dateDisplay = (task.dueDate === today) ? '' : ` ${task.dueDate}`;
-      return `${checkbox} ${task.title}${dateDisplay}`;
+// Describe the test suite for the TodoList
+describe("Todo List Test Suite", () => {
+  // This function runs before each test to reset the todo list
+  beforeEach(() => {
+    all().length = 0; // Clear all tasks before every test
+    add({
+      title: "Sample Task 1",
+      completed: false,
+      dueDate: new Date().toISOString().slice(0, 10), // Today's date
     });
-    return formattedList.join('\n');
-  };
+  });
 
-  return {
-    tasks,
-    addTask,
-    markCompleted,
-    getOverdue,
-    getDueToday,
-    getDueLater,
-    formatTaskList
-  };
-};
+  // Test for adding a new task
+  test("Add a new task", () => {
+    const taskCount = all().length; // Get the current number of tasks
+    add({
+      title: "Sample Task 2",
+      completed: false,
+      dueDate: new Date().toISOString().slice(0, 10), // Today's date
+    });
+    expect(all().length).toBe(taskCount + 1); // Check if task count increased by 1
+  });
 
-// ####################################### #
-// DO NOT CHANGE ANYTHING BELOW THIS LINE. #
-// ####################################### #
+  // Test for marking a task as complete
+  test("Mark task as completed", () => {
+    expect(all()[0].completed).toBe(false); // Check that the task is incomplete initially
+    markAsComplete(0); // Mark the first task as complete
+    expect(all()[0].completed).toBe(true); // Check that the task is now complete
+  });
 
-const todos = todoList();
+  // Test for retrieving overdue tasks
+  test("Get overdue tasks", () => {
+    all().length = 0; // Clear all tasks before adding new ones
 
-const formattedDate = d => {
-  return d.toISOString().split("T")[0];
-};
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1); // Set to one day ago
+    add({
+      title: "Overdue Task 1",
+      completed: false,
+      dueDate: yesterday.toISOString().slice(0, 10),
+    });
 
-const currentDate = new Date();
-const today = formattedDate(currentDate);
-const prevDate = formattedDate(new Date(currentDate.setDate(currentDate.getDate() - 1)));
-const nextDate = formattedDate(new Date(currentDate.setDate(currentDate.getDate() + 2)));
+    // Add another overdue task for testing
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2); // Set to two days ago
+    add({
+      title: "Overdue Task 2",
+      completed: false,
+      dueDate: twoDaysAgo.toISOString().slice(0, 10),
+    });
 
-todos.addTask({ title: 'Submit assignment', dueDate: prevDate, completed: false });
-todos.addTask({ title: 'Pay rent', dueDate: today, completed: true });
-todos.addTask({ title: 'Service Vehicle', dueDate: today, completed: false });
-todos.addTask({ title: 'File taxes', dueDate: nextDate, completed: false });
-todos.addTask({ title: 'Pay electric bill', dueDate: nextDate, completed: false });
+    // Log the current tasks to see what is being stored
+    console.log("Current Tasks:", all());
 
-console.log("My Todo-list\n");
+    const overdueTasks = getOverdueItems();
+    console.log("Overdue Tasks:", overdueTasks); // Log the overdue tasks
+    expect(overdueTasks.length).toBe(2); // Expect two overdue tasks
+    expect(overdueTasks[0].title).toBe("Overdue Task 1"); // Check the title of the first overdue task
+  });
 
-console.log("Overdue");
-const overdueTasks = todos.getOverdue();
-const formattedOverdue = todos.formatTaskList(overdueTasks);
-console.log(formattedOverdue);
-console.log("\n");
+  // Test for retrieving tasks due today
+  test("Get tasks due today", () => {
+    const todayTasks = getDueTodayItems();
+    expect(todayTasks.length).toBe(1); // There should be one task due today ("Sample Task 1")
+  });
 
-console.log("Due Today");
-const todayTasks = todos.getDueToday();
-const formattedToday = todos.formatTaskList(todayTasks);
-console.log(formattedToday);
-console.log("\n");
+  // Test for retrieving tasks due later
+  test("Get tasks due later", () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1); // Set to tomorrow
+    add({
+      title: "Future Task",
+      completed: false,
+      dueDate: tomorrow.toISOString().slice(0, 10),
+    });
 
-console.log("Due Later");
-const laterTasks = todos.getDueLater();
-const formattedLater = todos.formatTaskList(laterTasks);
-console.log(formattedLater);
-console.log("\n\n");
+    const futureTasks = getDueLaterItems();
+    expect(futureTasks.length).toBe(1); // There should be one task due later
+    expect(futureTasks[0].title).toBe("Future Task"); // Check the title of the future task
+  });
+});
